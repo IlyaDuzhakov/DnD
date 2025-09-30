@@ -1,10 +1,10 @@
 const columns = document.querySelectorAll(".list__tasks");
-const taskList = JSON.parse(localStorage.getItem('tasks')) || [];
+const taskList = JSON.parse(localStorage.getItem("tasks")) || [];
 // список задач taskList это то, что мы получаем из localStorage по ключу tasks или если в localStorage еще ничего нет, это будет []
 // localStorage хранит данные только в формате строки
 // JSON.parse строки преобразует обратно в объекты, массивы
-// JSON.stringify объекты и массивы преобразует в строки 
-console.log(taskList)
+// JSON.stringify объекты и массивы преобразует в строки
+console.log(taskList);
 let indexDnD = null;
 
 // рендер одной колонки (только DOM)
@@ -54,7 +54,7 @@ document.addEventListener("click", (e) => {
   if (index === -1) return; // защита — если нет такого таска, ничего не делаем
 
   taskList.splice(index, 1); // splice() - принимает index с которого начать изменения и количество удаляемых элементов
-  localStorage.setItem('tasks', JSON.stringify(taskList)) // записываем в localStorage актуальный массив задач
+  localStorage.setItem("tasks", JSON.stringify(taskList)); // записываем в localStorage актуальный массив задач
   renderAllColumns();
 });
 
@@ -79,7 +79,7 @@ function setupColumnDropZones() {
 
       const id = column.getAttribute("data-id");
       // const status =
-      //   id === "column-1" ? "new" : id === "column-2" ? "progress" : "done"; тернарные операторы 
+      //   id === "column-1" ? "new" : id === "column-2" ? "progress" : "done"; тернарные операторы
 
       let status;
       if (id === "column-1") {
@@ -92,7 +92,7 @@ function setupColumnDropZones() {
 
       if (typeof indexDnD === "number" && indexDnD >= 0) {
         taskList[indexDnD].status = status;
-        localStorage.setItem('tasks', JSON.stringify(taskList))
+        localStorage.setItem("tasks", JSON.stringify(taskList));
         indexDnD = null;
         renderAllColumns(); // перерендерим всё по новому статусу
       }
@@ -113,7 +113,8 @@ function setupTasksDnD() {
       setTimeout(() => (task.style.display = "none"), 0); // скрываем элемент, чтобы он не отображался в двух местах
     });
 
-    task.addEventListener("dragend", () => { // закончили перенос для самой задачи
+    task.addEventListener("dragend", () => {
+      // закончили перенос для самой задачи
       task.style.display = "block";
       indexDnD = null;
     });
@@ -158,15 +159,13 @@ for (let cardsEl of allCards) {
     // let status =
     //   id === "column-1" ? "new" : id === "column-2" ? "progress" : "done";
 
-    let status
+    let status;
     if (id === "column-1") {
-      status = "new"
-    }
-    else if (id === "column-2") {
-      status = "progress"
-    }
-    else {
-      status = "done"
+      status = "new";
+    } else if (id === "column-2") {
+      status = "progress";
+    } else {
+      status = "done";
     }
 
     btnAdd.addEventListener("click", () => {
@@ -175,8 +174,8 @@ for (let cardsEl of allCards) {
         alert("Заполни текст");
         return;
       }
-      taskList.push({ text:text, id: Date.now(), status:status });
-      localStorage.setItem('tasks', JSON.stringify(taskList))
+      taskList.push({ text: text, id: Date.now(), status: status });
+      localStorage.setItem("tasks", JSON.stringify(taskList));
       // убираем форму и показываем триггер снова
       const form = parent.querySelector(".new__task");
       if (form) form.remove();
