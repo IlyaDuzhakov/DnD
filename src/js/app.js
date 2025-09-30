@@ -1,51 +1,87 @@
 const columns = document.querySelectorAll(".list__tasks");
-const btnAdd = document.querySelector(".btn-add");
+const taskList = JSON.parse(localStorage.getItem('tasks')) || [];
+// список задач taskList это то, что мы получаем из localStorage по ключу tasks или если в localStorage еще ничего нет, это будет []
+// localStorage хранит данные только в формате строки
+// JSON.parse строки преобразует обратно в объекты, массивы
+// JSON.stringify объекты и массивы преобразует в строки 
+console.log(taskList)
+let indexDnD = null;
 
-const taskList = [];
-let indexDnD;
-
-const DnD = () => {
-  const tasks = document.querySelectorAll(".task");
-  let dragTask = null;
-  for (let i = 0; i < tasks.length; i++) {
-    tasks[i].draggable = true; // возможность переноса элемента
-    tasks[i].addEventListener("dragstart", () => {
-      // начало переноса
-      const id = tasks[i].getAttribute("data-id");
-      // console.log(id) получили текущий id
-      indexDnD = taskList.findIndex((el) => {
-        //{ text: textarea.value, id: Date.now(), status: status }
-        return el.id == id;
-      });
-      dragTask = tasks[i];
-      setTimeout(() => {
-        tasks[i].style.display = "none";
-      }, 0);
-    });
-    tasks[i].addEventListener("dragend", () => {
-      // конец переноса
-      // console.log(tasks[i]) текущая задача с data-id
-      // console.log(index);
-      tasks[i].style.display = "block";
-      tasks[i].style.backgroundColor = "yellow";
-      dragTask = null;
-    });
+// рендер одной колонки (только DOM)
+const randerTasks = function (column, status) {
+  column.innerHTML = ""; // чтобы не дублировались задачи
+  const filterTasks = taskList.filter((el) => {
+    return el.status === status;
+  });
+  for (let task of filterTasks) {
+    const taskHtml = `
+      <div class="task" data-id="${task.id}">
+        <div class="task-text">${task.text}</div>
+        <button class="btn-delete" aria-label="delete">&times;</button>
+        <div class="btn-edit" title="edit">&#9998;</div>
+      </div>`;
+    column.insertAdjacentHTML("beforeend", taskHtml); // происходит отрисовка
   }
+};
+
+//рендер всех колонок + после этого инициализация DnD
+function renderAllColumns() {
+  const map = {
+    "column-1": "new",
+    "column-2": "progress",
+    "column-3": "done",
+  };
+
+  Object.entries(map).forEach(([id, status]) => {
+    // Object.entries проходится по объекту и возвращает массив массивов
+    const column = document.querySelector(`[data-id="${id}"]`); // добираемся до каждой колонки по текущему data-id
+    if (column) randerTasks(column, status);
+  });
+
+  // после обновления DOM — навешиваем drag события на задачи
+  setupTasksDnD();
+}
+
+// делегирование удаления (навесили один раз)
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest(".btn-delete"); // closest добираемся до ближайшего дочернего элемента с заданным селектором
+  if (!btn) return;
+  const taskEl = btn.closest(".task");
+  if (!taskEl) return;
+
+  const id = taskEl.getAttribute("data-id"); // у текущей задачи получаем data-id
+  const index = taskList.findIndex((el) => el.id == id);
+  if (index === -1) return; // защита — если нет такого таска, ничего не делаем
+
+  taskList.splice(index, 1); // splice() - принимает index с которого начать изменения и количество удаляемых элементов
+  localStorage.setItem('tasks', JSON.stringify(taskList)) // записываем в localStorage актуальный массив задач
+  renderAllColumns();
+});
+
+// колонки: dragover / dragleave / drop — навесим один раз
+function setupColumnDropZones() {
   columns.forEach((column) => {
     column.addEventListener("dragover", (event) => {
-      // когда курсор оказывается в пределах выбранного элемента
-      event.preventDefault();
+      // dragover когда мы оказываемся в пределах той области, куда мы хотим сбросить элемент
+      event.preventDefault(); // отмена поведения браузера по умолчанию (disable)
       column.classList.add("dragover");
     });
+
     column.addEventListener("dragleave", () => {
-      // курсор уводим с выбранного элемента
+      // событие, когда мы уходим из заданной области
       column.classList.remove("dragover");
     });
-    column.addEventListener("drop", () => {
-      // когда какой-то элемент мы отпускаем в пределах выбранной области
-      // console.log(column);
-      let status;
+
+    column.addEventListener("drop", (event) => {
+      // сам сброс
+      event.preventDefault();
+      column.classList.remove("dragover");
+
       const id = column.getAttribute("data-id");
+      // const status =
+      //   id === "column-1" ? "new" : id === "column-2" ? "progress" : "done"; тернарные операторы 
+
+      let status;
       if (id === "column-1") {
         status = "new";
       } else if (id === "column-2") {
@@ -53,134 +89,104 @@ const DnD = () => {
       } else {
         status = "done";
       }
-      // console.log(indexDnD);
-      if (indexDnD || indexDnD === 0) {
-        taskList[indexDnD].status = status; // status текущее значение
-      }
-      console.log(taskList, 'событие DROP');
-      column.classList.remove("dragover");
-      if (dragTask) {
-        column.append(dragTask); // append позволяет добавить один html элемент внутрь другого тэга
+
+      if (typeof indexDnD === "number" && indexDnD >= 0) {
+        taskList[indexDnD].status = status;
+        localStorage.setItem('tasks', JSON.stringify(taskList))
+        indexDnD = null;
+        renderAllColumns(); // перерендерим всё по новому статусу
       }
     });
   });
-  {
-    /* <span class="priority-dot">🚀</span> */
-  }
-};
+}
 
+//drag для самих задач (вызвать после рендера)
+function setupTasksDnD() {
+  const tasks = document.querySelectorAll(".task");
+  tasks.forEach((task) => {
+    task.draggable = true; // активируем способность к перетаскиванию
+
+    task.addEventListener("dragstart", () => {
+      const id = task.getAttribute("data-id");
+      indexDnD = taskList.findIndex((el) => el.id == id);
+      // скрываем элемент пока тянем (чтобы не было дубля)
+      setTimeout(() => (task.style.display = "none"), 0); // скрываем элемент, чтобы он не отображался в двух местах
+    });
+
+    task.addEventListener("dragend", () => { // закончили перенос для самой задачи
+      task.style.display = "block";
+      indexDnD = null;
+    });
+  });
+}
+
+// добавление карточки
 const html = `
-    <div class="new__task">
+  <div class="new__task">
     <div class="textarea__wrapper">
-        <textarea placeholder="Введите название или вставьте ссылку" id="textarea"></textarea>
-        <div class="button-wrapper">
+      <textarea placeholder="Введите название или вставьте ссылку" id="textarea"></textarea>
+      <div class="button-wrapper">
         <button class="btn-add">Add card</button>
         <button class="btn-close">&times</button>
         <span class="point">...</span>
-        </div>
-        </div>
-      </div>`;
+      </div>
+    </div>
+  </div>`;
 
 const allCards = document.querySelectorAll(".cards");
 for (let cardsEl of allCards) {
-  // function attachAddCard(cardsEl) {
   cardsEl.addEventListener("click", (e) => {
     const trigger = e.target.closest(".add-card");
-    if (!trigger) return; // клик не по "+ Add another card"
+    if (!trigger) return;
     trigger.classList.add("hidden");
 
     trigger.insertAdjacentHTML("afterend", html);
     const parent = trigger.parentElement;
-    // console.log(parent)
     const btnClose = parent.querySelector(".btn-close");
-    // console.log(btnClose);
+
     btnClose.addEventListener("click", () => {
-      // console.log("работает");
       const form = parent.querySelector(".new__task");
-      // console.log(trigger, parent, form);
-      form.classList.add("hidden");
+      if (form) form.remove();
       trigger.classList.remove("hidden");
     });
+
     const btnAdd = parent.querySelector(".btn-add");
-    // console.log(btnAdd)
     const textarea = parent.querySelector("#textarea");
     const grandParent = parent.parentElement;
-    // console.log(grandParent)
     const currentColumn = grandParent.querySelector(".list__tasks");
-    let status;
     const id = currentColumn.getAttribute("data-id");
+    // let status =
+    //   id === "column-1" ? "new" : id === "column-2" ? "progress" : "done";
+
+    let status
     if (id === "column-1") {
-      status = "new";
-    } else if (id === "column-2") {
-      status = "progress";
-    } else {
-      status = "done";
+      status = "new"
     }
-    // console.log(currentColumn.getAttribute('data-id'))
+    else if (id === "column-2") {
+      status = "progress"
+    }
+    else {
+      status = "done"
+    }
+
     btnAdd.addEventListener("click", () => {
-      const newTask = { text: textarea.value, id: Date.now(), status: status };
-      if (newTask.text === "") {
-        alert(`Заполни текст`);
+      const text = textarea.value.trim();
+      if (!text) {
+        alert("Заполни текст");
         return;
       }
-      // console.log(newTask)
-      taskList.push(newTask);
-      textarea.value = ""; // очищаем textarea.value
-      // console.log(taskList);
-      // console.log(parent)
-      randerTasks(currentColumn, status); // передаю
+      taskList.push({ text:text, id: Date.now(), status:status });
+      localStorage.setItem('tasks', JSON.stringify(taskList))
+      // убираем форму и показываем триггер снова
+      const form = parent.querySelector(".new__task");
+      if (form) form.remove();
+      trigger.classList.remove("hidden");
+      renderAllColumns();
     });
   });
-  // }
 }
 
-const randerTasks = function (column, status) {
-  //принимаю
-  // отрисовка
-  // console.log(status)
-  column.innerHTML = "";
-  const filterTasks = taskList.filter((el) => {
-    return el.status === status;
-  });
-  for (let task of filterTasks) {
-    // только отрисовываем задачи с нужным статусом
-    const taskHtml = `
-    <div class="task" data-id = ${task.id}>${task.text} 
-    <button class="btn-delete">&times</button>
-    <div class="btn-edit">&#9998</div>
-    </div>`;
-    // ${task.id}>${task.text}  добираемся до свойств текущей задачи
-    column.insertAdjacentHTML("beforeend", taskHtml);
-  }
-  deleteTask();
-  DnD();
-};
+//  инициализация (навесить drop-зоны и начальный рендер)
 
-const deleteTask = () => {
-  const btnsDelete = document.querySelectorAll(".btn-delete");
-  for (let btn of btnsDelete) {
-    const column = btn.parentElement.parentElement;
-    let status;
-    const idColumn = column.getAttribute("data-id");
-    if (idColumn === "column-1") {
-      status = "new";
-    } else if (idColumn === "column-2") {
-      status = "progress";
-    } else {
-      status = "done";
-    }
-    btn.addEventListener("click", () => {
-      // console.log(btn.parentElement) // получаем доступ к родительскому элементу в html разметке btn.parentElement
-      const id = btn.parentElement.getAttribute("data-id");
-      // console.log(id)
-      const index = taskList.findIndex((el) => {
-        return el.id == id;
-      });
-      console.log(index)
-      taskList.splice(index, 1);
-      console.log(taskList, 'удаление')
-      // randerTasks(column, status);
-      // console.log(taskList)
-    });
-  }
-};
+setupColumnDropZones();
+renderAllColumns();
