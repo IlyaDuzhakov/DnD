@@ -59,12 +59,23 @@ document.addEventListener("click", (e) => {
 });
 
 // колонки: dragover / dragleave / drop — навесим один раз
+
+const placeholder = document.createElement("div");
+placeholder.classList.add("placeholder"); // вынесли placeholder чтобы был к нему доступ
+
 function setupColumnDropZones() {
   columns.forEach((column) => {
     column.addEventListener("dragover", (event) => {
       // dragover когда мы оказываемся в пределах той области, куда мы хотим сбросить элемент
       event.preventDefault(); // отмена поведения браузера по умолчанию (disable)
       column.classList.add("dragover");
+      const closestElement = countSize(column, event.clientY);
+      console.log(closestElement);
+      if (closestElement === null) {
+        column.append(placeholder);
+      } else {
+        column.insertBefore(placeholder, closestElement); // если ближайший элемент найден, мы вставляем placeholder по отношению к нему
+      }
     });
 
     column.addEventListener("dragleave", () => {
@@ -107,11 +118,22 @@ function setupTasksDnD() {
     task.draggable = true; // активируем способность к перетаскиванию
 
     task.addEventListener("dragstart", () => {
+      // console.log('событие работает')
+      // task.style.cursor = "grab"  готов к захвату
+      // task.classList.add('grabble')
+      // task.style.background = 'red'
       const id = task.getAttribute("data-id");
       indexDnD = taskList.findIndex((el) => el.id == id);
       // скрываем элемент пока тянем (чтобы не было дубля)
+      // task.style.display = "none"
       setTimeout(() => (task.style.display = "none"), 0); // скрываем элемент, чтобы он не отображался в двух местах
+      // без setTimeout не будет работать логика с переносом, так как элемент будет исчезать
     });
+
+    // task.addEventListener('drag', (event) => {
+    //   console.log(event.target.closest('.task'))
+
+    // })
 
     task.addEventListener("dragend", () => {
       // закончили перенос для самой задачи
@@ -184,6 +206,30 @@ for (let cardsEl of allCards) {
     });
   });
 }
+
+const countSize = (container, y) => {
+  // y это координата курсора
+  const allTasks = container.querySelectorAll(".task"); // добираемся до всех задач
+  let closestElement = null; // ближайший элемент в данный момент null пока не найден
+  let closestCoordinates = Number.NEGATIVE_INFINITY; // число, которое будет меньше любого другого числа
+  const rezult = [];
+  for (let task of allTasks) {
+    let coords = task.getBoundingClientRect(); // получаем координаты нашего элемента
+    // console.log(coords)
+    const centralCoords = coords.top + coords.height / 2;
+    const differenceBetweenCoordidinates = y - centralCoords;
+    if (
+      differenceBetweenCoordidinates < 0 &&
+      differenceBetweenCoordidinates > closestCoordinates
+    ) {
+      closestCoordinates = differenceBetweenCoordidinates;
+      closestElement = task;
+      // placeholder.style.height = coords.height + "px"; // когда мы к любому числу добавляенм строковое значение, число становится строковым
+    }
+    // rezult.push(coords.height)
+  }
+  return closestElement;
+};
 
 //  инициализация (навесить drop-зоны и начальный рендер)
 
