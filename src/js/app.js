@@ -84,14 +84,10 @@ function setupColumnDropZones() {
     });
 
     column.addEventListener("drop", (event) => {
-      // сам сброс
       event.preventDefault();
       column.classList.remove("dragover");
 
       const id = column.getAttribute("data-id");
-      // const status =
-      //   id === "column-1" ? "new" : id === "column-2" ? "progress" : "done"; тернарные операторы
-
       let status;
       if (id === "column-1") {
         status = "new";
@@ -102,10 +98,42 @@ function setupColumnDropZones() {
       }
 
       if (typeof indexDnD === "number" && indexDnD >= 0) {
-        taskList[indexDnD].status = status;
+        const draggedTask = taskList[indexDnD];
+        draggedTask.status = status;
+
+        // найдём куда вставить
+        const tasksInColumn = [...column.querySelectorAll(".task")];
+        const placeholderIndex = tasksInColumn.findIndex(
+          (t) => t === placeholder,
+        );
+
+        // удаляем из старого места
+        taskList.splice(indexDnD, 1);
+
+        // вставляем в нужное место
+        if (placeholderIndex === -1) {
+          taskList.push(draggedTask);
+        } else {
+          const newIndex = taskList.findIndex(
+            (t) =>
+              t.status === status &&
+              tasksInColumn.indexOf(
+                document.querySelector(`[data-id="${t.id}"]`),
+              ) >= placeholderIndex,
+          );
+          if (newIndex === -1) {
+            taskList.push(draggedTask);
+          } else {
+            taskList.splice(newIndex, 0, draggedTask);
+          }
+        }
+
         localStorage.setItem("tasks", JSON.stringify(taskList));
         indexDnD = null;
-        renderAllColumns(); // перерендерим всё по новому статусу
+        renderAllColumns();
+      }
+      if (placeholder.parentElement) {
+        placeholder.parentElement.removeChild(placeholder);
       }
     });
   });
@@ -118,14 +146,14 @@ function setupTasksDnD() {
     task.draggable = true; // активируем способность к перетаскиванию
 
     task.addEventListener("dragstart", () => {
-      // console.log('событие работает')
-      // task.style.cursor = "grab"  готов к захвату
-      // task.classList.add('grabble')
-      // task.style.background = 'red'
       const id = task.getAttribute("data-id");
       indexDnD = taskList.findIndex((el) => el.id == id);
-      // скрываем элемент пока тянем (чтобы не было дубля)
-      // task.style.display = "none"
+      const rect = task.getBoundingClientRect();
+
+      //Задаем плейсхолдеру размеры
+      placeholder.style.height = rect.height + "px";
+      placeholder.style.width = rect.width + "px";
+      placeholder.style.margin = getComputedStyle(task).margin;
       setTimeout(() => (task.style.display = "none"), 0); // скрываем элемент, чтобы он не отображался в двух местах
       // без setTimeout не будет работать логика с переносом, так как элемент будет исчезать
     });
@@ -212,7 +240,7 @@ const countSize = (container, y) => {
   const allTasks = container.querySelectorAll(".task"); // добираемся до всех задач
   let closestElement = null; // ближайший элемент в данный момент null пока не найден
   let closestCoordinates = Number.NEGATIVE_INFINITY; // число, которое будет меньше любого другого числа
-  const rezult = [];
+
   for (let task of allTasks) {
     let coords = task.getBoundingClientRect(); // получаем координаты нашего элемента
     // console.log(coords)
