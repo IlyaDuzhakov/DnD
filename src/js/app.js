@@ -1,46 +1,12 @@
-const columns = document.querySelectorAll(".list__tasks");
+import { renderAllColumns } from "./renderAllColumns";
+import { setupColumnDropZones } from "./setupDnD";
+
 const taskList = JSON.parse(localStorage.getItem("tasks")) || [];
 // список задач taskList это то, что мы получаем из localStorage по ключу tasks или если в localStorage еще ничего нет, это будет []
 // localStorage хранит данные только в формате строки
 // JSON.parse строки преобразует обратно в объекты, массивы
 // JSON.stringify объекты и массивы преобразует в строки
-console.log(taskList);
-let indexDnD = null;
-
-// рендер одной колонки (только DOM)
-const randerTasks = function (column, status) {
-  column.innerHTML = ""; // чтобы не дублировались задачи
-  const filterTasks = taskList.filter((el) => {
-    return el.status === status;
-  });
-  for (let task of filterTasks) {
-    const taskHtml = `
-      <div class="task" data-id="${task.id}">
-        <div class="task-text">${task.text}</div>
-        <button class="btn-delete" aria-label="delete">&times;</button>
-        <div class="btn-edit" title="edit">&#9998;</div>
-      </div>`;
-    column.insertAdjacentHTML("beforeend", taskHtml); // происходит отрисовка
-  }
-};
-
-//рендер всех колонок + после этого инициализация DnD
-function renderAllColumns() {
-  const map = {
-    "column-1": "new",
-    "column-2": "progress",
-    "column-3": "done",
-  };
-
-  Object.entries(map).forEach(([id, status]) => {
-    // Object.entries проходится по объекту и возвращает массив массивов
-    const column = document.querySelector(`[data-id="${id}"]`); // добираемся до каждой колонки по текущему data-id
-    if (column) randerTasks(column, status);
-  });
-
-  // после обновления DOM — навешиваем drag события на задачи
-  setupTasksDnD();
-}
+// console.log(taskList);
 
 // делегирование удаления (навесили один раз)
 document.addEventListener("click", (e) => {
@@ -62,114 +28,6 @@ document.addEventListener("click", (e) => {
 
 const placeholder = document.createElement("div");
 placeholder.classList.add("placeholder"); // вынесли placeholder чтобы был к нему доступ
-
-function setupColumnDropZones() {
-  columns.forEach((column) => {
-    column.addEventListener("dragover", (event) => {
-      // dragover когда мы оказываемся в пределах той области, куда мы хотим сбросить элемент
-      event.preventDefault(); // отмена поведения браузера по умолчанию (disable)
-      column.classList.add("dragover");
-      const closestElement = countSize(column, event.clientY);
-      console.log(closestElement);
-      if (closestElement === null) {
-        column.append(placeholder);
-      } else {
-        column.insertBefore(placeholder, closestElement); // если ближайший элемент найден, мы вставляем placeholder по отношению к нему
-      }
-    });
-
-    column.addEventListener("dragleave", () => {
-      // событие, когда мы уходим из заданной области
-      column.classList.remove("dragover");
-    });
-
-    column.addEventListener("drop", (event) => {
-      event.preventDefault();
-      column.classList.remove("dragover");
-
-      const id = column.getAttribute("data-id");
-      let status;
-      if (id === "column-1") {
-        status = "new";
-      } else if (id === "column-2") {
-        status = "progress";
-      } else {
-        status = "done";
-      }
-
-      if (typeof indexDnD === "number" && indexDnD >= 0) {
-        const draggedTask = taskList[indexDnD];
-        draggedTask.status = status;
-
-        // найдём куда вставить
-        const tasksInColumn = [...column.querySelectorAll(".task")];
-        const placeholderIndex = tasksInColumn.findIndex(
-          (t) => t === placeholder,
-        );
-
-        // удаляем из старого места
-        taskList.splice(indexDnD, 1);
-
-        // вставляем в нужное место
-        if (placeholderIndex === -1) {
-          taskList.push(draggedTask);
-        } else {
-          const newIndex = taskList.findIndex(
-            (t) =>
-              t.status === status &&
-              tasksInColumn.indexOf(
-                document.querySelector(`[data-id="${t.id}"]`),
-              ) >= placeholderIndex,
-          );
-          if (newIndex === -1) {
-            taskList.push(draggedTask);
-          } else {
-            taskList.splice(newIndex, 0, draggedTask);
-          }
-        }
-
-        localStorage.setItem("tasks", JSON.stringify(taskList));
-        indexDnD = null;
-        renderAllColumns();
-      }
-      if (placeholder.parentElement) {
-        placeholder.parentElement.removeChild(placeholder);
-      }
-    });
-  });
-}
-
-//drag для самих задач (вызвать после рендера)
-function setupTasksDnD() {
-  const tasks = document.querySelectorAll(".task");
-  tasks.forEach((task) => {
-    task.draggable = true; // активируем способность к перетаскиванию
-
-    task.addEventListener("dragstart", () => {
-      const id = task.getAttribute("data-id");
-      indexDnD = taskList.findIndex((el) => el.id == id);
-      const rect = task.getBoundingClientRect();
-
-      //Задаем плейсхолдеру размеры
-      placeholder.style.height = rect.height + "px";
-      placeholder.style.width = rect.width + "px";
-      placeholder.style.margin = getComputedStyle(task).margin;
-      setTimeout(() => (task.style.display = "none"), 0); // скрываем элемент, чтобы он не отображался в двух местах
-      // без setTimeout не будет работать логика с переносом, так как элемент будет исчезать
-    });
-
-    // task.addEventListener('drag', (event) => {
-    //   console.log(event.target.closest('.task'))
-
-    // })
-
-    task.addEventListener("dragend", () => {
-      // закончили перенос для самой задачи
-      task.style.display = "block";
-      indexDnD = null;
-    });
-  });
-}
 
 // добавление карточки
 const html = `
@@ -235,31 +93,9 @@ for (let cardsEl of allCards) {
   });
 }
 
-const countSize = (container, y) => {
-  // y это координата курсора
-  const allTasks = container.querySelectorAll(".task"); // добираемся до всех задач
-  let closestElement = null; // ближайший элемент в данный момент null пока не найден
-  let closestCoordinates = Number.NEGATIVE_INFINITY; // число, которое будет меньше любого другого числа
-
-  for (let task of allTasks) {
-    let coords = task.getBoundingClientRect(); // получаем координаты нашего элемента
-    // console.log(coords)
-    const centralCoords = coords.top + coords.height / 2;
-    const differenceBetweenCoordidinates = y - centralCoords;
-    if (
-      differenceBetweenCoordidinates < 0 &&
-      differenceBetweenCoordidinates > closestCoordinates
-    ) {
-      closestCoordinates = differenceBetweenCoordidinates;
-      closestElement = task;
-      // placeholder.style.height = coords.height + "px"; // когда мы к любому числу добавляенм строковое значение, число становится строковым
-    }
-    // rezult.push(coords.height)
-  }
-  return closestElement;
-};
-
 //  инициализация (навесить drop-зоны и начальный рендер)
 
 setupColumnDropZones();
 renderAllColumns();
+
+export { taskList, placeholder };
