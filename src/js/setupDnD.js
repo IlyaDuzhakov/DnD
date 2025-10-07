@@ -30,6 +30,7 @@ function setupTasksDnD() {
     // })
 
     task.addEventListener("dragend", () => {
+      placeholder.remove();
       // закончили перенос для самой задачи
       task.style.display = "block";
       indexDnD = null;
@@ -57,6 +58,60 @@ function setupColumnDropZones() {
       column.classList.remove("dragover");
     });
 
+    // column.addEventListener("drop", (event) => {
+    //   event.preventDefault();
+    //   column.classList.remove("dragover");
+
+    //   const id = column.getAttribute("data-id");
+    //   let status;
+    //   if (id === "column-1") {
+    //     status = "new";
+    //   } else if (id === "column-2") {
+    //     status = "progress";
+    //   } else {
+    //     status = "done";
+    //   }
+
+    //   if (typeof indexDnD === "number" && indexDnD >= 0) {
+    //     const draggedTask = taskList[indexDnD];
+    //     draggedTask.status = status;
+
+    //     // найдём куда вставить
+    //     const tasksInColumn = [...column.querySelectorAll(".task")]; // спред оператор распаковывает элементы какой-то последовательности
+    //     const placeholderIndex = tasksInColumn.findIndex(
+    //       // ищем индекс элемента в массиве по условию
+    //       (t) => t === placeholder,
+    //     );
+
+    //     // удаляем из старого места
+    //     taskList.splice(indexDnD, 1);
+
+    //     // вставляем в нужное место
+    //     if (placeholderIndex === -1) {
+    //       taskList.push(draggedTask); // метод push всегда добавляет элемент в конец массива
+    //     } else {
+    //       const newIndex = taskList.findIndex(
+    //         (t) =>
+    //           t.status === status &&
+    //           tasksInColumn.indexOf(
+    //             document.querySelector(`[data-id="${t.id}"]`),
+    //           ) >= placeholderIndex,
+    //       );
+    //       if (newIndex === -1) {
+    //         taskList.push(draggedTask);
+    //       } else {
+    //         taskList.splice(newIndex, 0, draggedTask);
+    //       }
+    //     }
+
+    //     localStorage.setItem("tasks", JSON.stringify(taskList));
+    //     indexDnD = null;
+    //     renderAllColumns();
+    //   }
+    //   if (placeholder.parentElement) {
+    //     placeholder.parentElement.remove(placeholder); // removeChild заменяем на remove так как removeChild устарел
+    //   }
+    // });
     column.addEventListener("drop", (event) => {
       event.preventDefault();
       column.classList.remove("dragover");
@@ -75,40 +130,38 @@ function setupColumnDropZones() {
         const draggedTask = taskList[indexDnD];
         draggedTask.status = status;
 
-        // найдём куда вставить
-        const tasksInColumn = [...column.querySelectorAll(".task")]; // спред оператор распаковывает элементы какой-то последовательности
-        const placeholderIndex = tasksInColumn.findIndex(
-          // ищем индекс элемента в массиве по условию
-          (t) => t === placeholder,
-        );
-
-        // удаляем из старого места
+        // удаляем задачу из старого места
         taskList.splice(indexDnD, 1);
 
-        // вставляем в нужное место
-        if (placeholderIndex === -1) {
-          taskList.push(draggedTask); // метод push всегда добавляет элемент в конец массива
-        } else {
-          const newIndex = taskList.findIndex(
-            (t) =>
-              t.status === status &&
-              tasksInColumn.indexOf(
-                document.querySelector(`[data-id="${t.id}"]`),
-              ) >= placeholderIndex,
-          );
-          if (newIndex === -1) {
-            taskList.push(draggedTask);
-          } else {
-            taskList.splice(newIndex, 0, draggedTask);
+        // ищем, куда вставить — по placeholder
+        const tasksInColumn = Array.from(column.querySelectorAll(".task"));
+        const placeholderIndex = Array.from(column.children).indexOf(
+          placeholder,
+        );
+
+        // вычисляем индекс, куда вставлять в taskList
+        let insertIndex = taskList.length;
+        if (placeholderIndex !== -1 && tasksInColumn.length > 0) {
+          // находим задачу, которая идёт после placeholder в DOM
+          const nextTaskEl = column.children[placeholderIndex + 1];
+          if (nextTaskEl && nextTaskEl.classList.contains("task")) {
+            const nextTaskId = nextTaskEl.getAttribute("data-id");
+            const nextTaskIndex = taskList.findIndex((t) => t.id == nextTaskId);
+            if (nextTaskIndex !== -1) {
+              insertIndex = nextTaskIndex;
+            }
           }
         }
+
+        taskList.splice(insertIndex, 0, draggedTask);
 
         localStorage.setItem("tasks", JSON.stringify(taskList));
         indexDnD = null;
         renderAllColumns();
       }
+
       if (placeholder.parentElement) {
-        placeholder.parentElement.remove(placeholder); // removeChild заменяем на remove так как removeChild устарел
+        placeholder.remove();
       }
     });
   });
