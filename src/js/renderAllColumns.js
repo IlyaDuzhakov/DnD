@@ -6,7 +6,8 @@ function renderAllColumns() {
   const map = {
     "column-1": "new",
     "column-2": "progress",
-    "column-3": "done",
+    "column-3": "priority",
+    "column-4": "done",
   };
 
   Object.entries(map).forEach(([id, status]) => {

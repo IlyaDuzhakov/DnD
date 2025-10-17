@@ -7,59 +7,62 @@
     <title>Document</title>
   </head>
   <body>
-    <div class="container">
-      <div class="todo column color-left">
-        <div class="wrapper">
-          <h2 class="title">TODO</h2>
-          <span class="point">...</span>
-        </div>
-        
-        <div class="list__tasks" data-id = 'column-1'>
-          <!-- <div class="task">khgghghgjgjgh
+    <div id="app">
+      <div class="container">
+        <div class="todo column color-left">
+          <div class="wrapper">
+            <h2 class="title">TODO</h2>
+            <span class="point">...</span>
+          </div>
+
+          <div class="list__tasks" data-id="column-1">
+            <!-- <div class="task">khgghghgjgjgh
             <button class="btn-delete">&times</button>
           </div> -->
-          <!-- <div class="task">vменяем</div> -->
-          <!-- <div class="task">vменяем</div> -->
+            <!-- <div class="task">vменяем</div> -->
+            <!-- <div class="task">vменяем</div> -->
+          </div>
+          <div class="cards">
+            <p class="add-card">+ Add another card</p>
+          </div>
         </div>
-        <div class="cards">
-          <p class="add-card">
-            + Add another card
-          </p>
-        </div>
-      </div>
-      
-      
 
-      <div class="in__progress column color-center">
-        <div class="wrapper">
-          <h2 class="title">IN PROGRESS</h2>
-          <span class="point">...</span>
-          
+        <div class="in__progress column color-center">
+          <div class="wrapper">
+            <h2 class="title">IN PROGRESS</h2>
+            <span class="point">...</span>
+          </div>
+          <div class="list__tasks" data-id="column-2"><!--id="column-2"--></div>
+          <div class="cards">
+            <p class="add-card">+ Add another card</p>
+          </div>
         </div>
-        <div  class="list__tasks" data-id = 'column-2'> <!--id="column-2"-->
-         
+
+        <div class="Priority column color-four">
+          <div class="wrapper">
+            <h2 class="title">PRIORITY</h2>
+            <span class="point">...</span>
+          </div>
+          <div class="list__tasks" data-id="column-3">
+            <!-- делаем через data atribute-->
+          </div>
+          <div class="cards">
+            <p class="add-card">+ Add another card</p>
+          </div>
         </div>
-         <div class="cards">
-          <p class="add-card">
-            + Add another card
-          </p>
+        <div class="done column color-right">
+          <div class="wrapper">
+            <h2 class="title">DONE</h2>
+            <span class="point">...</span>
+          </div>
+          <div class="list__tasks" data-id="column-4">
+            <!-- делаем через data atribute-->
+          </div>
+          <div class="cards">
+            <p class="add-card">+ Add another card</p>
+          </div>
         </div>
       </div>
-      <div class="done column color-right">
-        <div class="wrapper">
-          <h2 class="title">DONE</h2>
-          <span class="point">...</span>
-        </div>
-        <div class="list__tasks" data-id ="column-3"> <!-- делаем через data atribute-->
-         
-        </div>
-        <div class="cards">
-          <p class="add-card">
-            + Add another card
-          </p>
-        </div>
-      </div>
-      
     </div>
   </body>
 </html>

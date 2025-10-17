@@ -4,13 +4,15 @@ body {
 
 .container {
   display: flex;
-  background-color: #8fa1e8;
+  background-color: #006cd2;
 }
 
 .column {
   margin: 20px;
-  width: 300px;
-  height: 100vh;
+  width: 350px;
+  height: 100%;
+  /* height: 100vh; */
+  /* flex: 1; */
 }
 
 .task {
@@ -21,9 +23,10 @@ body {
 }
 
 .task-text {
-    text-wrap: wrap; /* переносит только если в словах есть пробелы*/
-    word-break: break-all;
-    font-size:16px;
+  text-wrap: wrap; /* переносит только если в словах есть пробелы*/
+  word-break: break-all;
+  font-size: 16px;
+  /* margin-bottom: 100px; */
 }
 
 .title {
@@ -32,15 +35,19 @@ body {
 }
 
 .color-left {
-  background-color: #94dfff;
+  background-color: #fdfeff;
 }
 
 .color-center {
-  background-color: #96f870;
+  background-color: #fbff02;
 }
 
 .color-right {
-  background-color: #f7f77d;
+  background-color: #3fff0a;
+}
+
+.color-four {
+  background-color: #ff0000;
 }
 
 .wrapper {
@@ -62,17 +69,17 @@ body {
 }
 
 .task:hover {
-    cursor: grab;
+  cursor: grab;
 }
 
 .grabble {
-    cursor: grabbing;
+  cursor: grabbing;
 }
 
 .new__task {
-    margin-top: 10px;
-    margin-bottom: 10px;
-} 
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
 
 .add-card {
   color: #000;
@@ -91,8 +98,16 @@ body {
 }
 
 .list__tasks {
-  background-color: rgb(159, 251, 251);
-  min-height: 150px;
+  background-color: rgb(122, 235, 255);
+  /* min-height: 650px; */
+  display: flex;
+  flex-direction: column;
+  /* padding: 10px 10px;  */
+  /* gap: 10px; */
+  /* flex-grow: 1; Растягивается */
+  /* min-height: 10px; */
+  overflow-y: auto; /* скролл если много */
+  /* flex-grow: 1; */
 }
 
 .dragover {
@@ -100,16 +115,18 @@ body {
 }
 
 .btn-delete {
-    position: absolute;
-    right: 5px;
-    top: 50%;
-    transform: translateY(-50%); /* можно любой элемент разместить по центру какого-то блока*/
-    display: none;
-    background-color: #02d151;
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(
+    -50%
+  ); /* можно любой элемент разместить по центру какого-то блока*/
+  display: none;
+  background-color: #02d151;
 }
 
 .btn-delete:hover {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .task:hover .btn-delete {
@@ -134,45 +151,44 @@ body {
 }
 
 .btn-check {
-    position: absolute;
-    margin-top: 24px;
-    margin-left: -244px;
+  position: absolute;
+  margin-top: 24px;
+  margin-left: -244px;
 }
 
 .textarea__wrapper {
-    /* position: absolute; */
-    margin-left: 10px;
-    margin-right: 10px;
-    height: 100px;
-    border: 6px #8db3ca solid;
-    background-color: hsl(150, 7%, 83%);
-    border-radius: 4px;
-    
+  /* position: absolute; */
+  margin-left: 10px;
+  margin-right: 10px;
+  height: 100px;
+  border: 6px #8db3ca solid;
+  background-color: hsl(150, 7%, 83%);
+  border-radius: 4px;
 }
 
 .button-wrapper {
-    display: flex;
-    justify-content: space-between;
-    margin-left: 10px;
-    margin-right: 10px;
+  display: flex;
+  justify-content: space-between;
+  margin-left: 10px;
+  margin-right: 10px;
 }
 
 .btn-add {
-    width: 100px;
-    height: 30px;
-    border: 1px #000 solid;
-    background-color: #02d151;
-    border-radius: 4px;
-    font-weight: 700;
-    cursor: pointer;
+  width: 100px;
+  height: 30px;
+  border: 1px #000 solid;
+  background-color: #02d151;
+  border-radius: 4px;
+  font-weight: 700;
+  cursor: pointer;
 }
 
 .btn-close {
-    border: none;
-    background: none;
-    font-size: 18px;
-    font-weight: 700;
-    cursor: pointer;
+  border: none;
+  background: none;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
 }
 
 /* .priority-dot {
@@ -181,18 +197,286 @@ body {
     
 } */
 
+.cards {
+  max-height: 30px;
+}
+
 .btn-edit {
-    position: absolute;
-    top: 10px;
-    right: 8px;
-    border: 1px #000 solid;
-    border-radius: 2px;
-    padding: 1px;
-    display: none;
+  position: absolute;
+  top: 10px;
+  right: 8px;
+  border: 1px #000 solid;
+  border-radius: 2px;
+  padding: 1px;
+  display: none;
 }
 
 .placeholder {
-    height: 60px;
-    background-color: #f51941;
-    border: 1px solid #000;
+  height: 60px;
+  background-color: #f51941;
+  border: 1px solid #000;
+  /* box-shadow: 32px 2px 5px #ffff01; */
+}
+
+.logo-container {
+  display: flex;
+  height: 100%;
+  background-color: #8fa1e8;
+}
+
+.logo {
+  height: 100px;
+  width: auto;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(20px);
+  }
+}
+
+.header-title {
+  font-size: 46px;
+  color: #000000;
+  font-weight: 800;
+  margin: 0 auto;
+  margin-top: 20px;
+  box-shadow: 2px #f7f77d;
+}
+
+.header {
+  background: #ffffff;
+  padding: 20px 30px;
+  font-size: 24px;
+  font-weight: bold;
+  border-bottom: 2px solid #ddd;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 30px;
+  background-color: #3fff0a;
+  border-top: 2px solid #ddd;
+  height: 60px;
+  align-items: center;
+  font-size: 14px;
+}
+
+/*.   top-info-panel   */
+.top-info-panel {
+  padding: 20px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  margin-bottom: 20px;
+  border-radius: 12px;
+}
+
+.top-panel-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+/* Блок часов */
+.time-block {
+  background-color: #000;
+  color: #00ff00;
+  font-family: "Courier New", Courier, monospace;
+  padding: 15px 20px;
+  border-radius: 12px;
+  min-width: 200px;
+  font-size: 18px;
+  line-height: 1.6;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Блок срочных задач */
+.urgent-block {
+  background-color: #ff6f61;
+  height: 250px;
+  max-width: 700px;
+  color: white;
+  padding: 25px 30px;
+  border-radius: 20px;
+  flex-grow: 1;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(255, 50, 50, 0.3);
+}
+
+.urgent-block h3 {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.urgent-block p {
+  font-size: 16px;
+}
+
+/* Календарь */
+.calendar-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+  font-size: 16px;
+  color: #007bff;
+}
+
+.calendar-block label {
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.calendar-input {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+  background-color: #fff;
+}
+
+.logo-container {
+  background: linear-gradient(-45deg, #43e97b, #38f9d7, #3b82f6, #9333ea);
+  background-size: 400% 400%;
+  animation: gradient 10s ease infinite;
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/*.  footer.  */
+
+.made,
+.trap,
+.time {
+  font-weight: 700;
+  color: #000000;
+  font-size: 16px;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  background: linear-gradient(45deg, #6902d8, #0d65fd);
+  color: white;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.footer-left,
+.footer-center,
+.footer-right {
+  display: flex;
+  align-items: center;
+}
+
+.trash-wrapper {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.trash-wrapper:hover {
+  transform: scale(1.1);
+}
+
+.trash-icon {
+  width: 44px;
+  height: 44px;
+  color: white;
+  margin-right: 8px;
+}
+
+.trash-label {
+  color: rgb(0, 0, 0);
+}
+
+.made {
+  font-weight: 700;
+}
+
+.time {
+  opacity: 0.8;
+}
+
+.calendar-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  font-size: 18px;
+  margin-top: 10px;
+}
+
+.calendar-block label {
+  font-weight: bold;
+  color: #3366cc;
+  margin-bottom: 5px;
+}
+
+.calendar-input {
+  font-size: 16px;
+  padding: 8px 12px;
+  border: 2px solid #3366cc;
+  border-radius: 8px;
+  width: 180px;
+  outline: none;
+  transition: 0.2s;
+}
+
+.calendar-input:focus {
+  border-color: #6699ff;
+  box-shadow: 0 0 5px rgba(102, 153, 255, 0.5);
+}
+.calendar-widget {
+  width: 100px;
+  height: 100px;
+  background: white;
+  border-radius: 14px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+  text-align: center;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  cursor: pointer;
+  user-select: none;
+  overflow: hidden;
+  border: 2px solid #e66;
+  transition: transform 0.2s ease;
+}
+
+.calendar-widget:hover {
+  transform: scale(1.05);
+}
+
+.calendar-month {
+  background-color: #e66;
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+  padding: 2px 0;
+  text-transform: uppercase;
+}
+
+.calendar-day {
+  font-size: 56px;
+  font-weight: bold;
+  color: #333;
+  padding-top: 2px;
 }

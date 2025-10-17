@@ -72,6 +72,8 @@ for (let cardsEl of allCards) {
       status = "new";
     } else if (id === "column-2") {
       status = "progress";
+    } else if (id === "column-3") {
+      status = "priority";
     } else {
       status = "done";
     }
@@ -82,7 +84,13 @@ for (let cardsEl of allCards) {
         alert("Заполни текст");
         return;
       }
-      taskList.push({ text: text, id: Date.now(), status: status });
+      taskList.push({
+        text: text,
+        id: Date.now(),
+        status: status,
+        createdAt: new Date(),
+      }); // createdAt отображаем дату для того, чтобы использовать ее для архива и календаря
+      console.log(new Date());
       localStorage.setItem("tasks", JSON.stringify(taskList));
       // убираем форму и показываем триггер снова
       const form = parent.querySelector(".new__task");
