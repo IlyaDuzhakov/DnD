@@ -1,3 +1,17 @@
+function generateStars(n = 20) {
+  return [...Array(n)].map(() => {
+    const left = Math.floor(Math.random() * 95); // процент от ширины
+    const top = Math.floor(Math.random() * 70);  // процент от высоты
+    const size = Math.random() * 8 + 6;          // размер 6–14px
+    return `
+      <svg class="star-icon" style="left: ${left}%; top: ${top}%; width: ${size}px; height: ${size}px;" viewBox="0 0 24 24" fill="#fffacd">
+        <polygon points="12,2 15,9 22,9 17,14 19,21 12,17 5,21 7,14 2,9 9,9"/>
+      </svg>
+    `;
+  }).join('');
+}
+
+
 export function createTopInfoPanel() {
   const panel = document.createElement("div");
   panel.classList.add("top-info-panel");
@@ -19,8 +33,9 @@ export function createTopInfoPanel() {
       </div>
 
       <div class="urgent-block">
-        <h3>🔥 Срочные задачи</h3>
-        <p>Здесь будут отображаться задачи, привязанные к дате</p>
+        
+        <div id="day-overview"></div>
+        
       </div>
 
      <div class="calendar-block">
