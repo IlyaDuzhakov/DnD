@@ -1,6 +1,10 @@
 import { placeholder, taskList } from "./app"; // когда у нас несколько переменных импортируется из одного файла это можно делать через запятую
 import { countSize } from "./countSize"; // когда у нас несколько переменных импортируется из одного файла это можно делать через запятую
 import { renderAllColumns } from "./renderAllColumns"; // когда у нас несколько переменных импортируется из одного файла это можно делать через запятую
+import { renderDayOverview } from "./dayOverview";
+import { showSuccessModal } from "./successModal";
+
+ // когда у нас несколько переменных импортируется из одного файла это можно делать через запятую
 
 let indexDnD = null;
 const columns = document.querySelectorAll(".column");
@@ -73,6 +77,8 @@ function setupColumnDropZones() {
         status = "priority";
       } else if (id === "column-4") {
         status = "done";
+        // Показываем модальное окно, если задача попала в DONE
+        showSuccessModal();
       }
 
       if (typeof indexDnD === "number" && indexDnD >= 0) {
@@ -105,6 +111,8 @@ function setupColumnDropZones() {
         localStorage.setItem("tasks", JSON.stringify(taskList));
         indexDnD = null;
         renderAllColumns();
+        renderDayOverview();
+
       }
 
       if (placeholder.parentElement) {

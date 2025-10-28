@@ -8,6 +8,8 @@ import { createTopInfoPanel } from "./components/TopInfoPanel.js";
 import { initFlatpickr } from './js/initFlatpickr.js';
 import "flatpickr/dist/themes/material_blue.css";
 
+
+
 const root = document.getElementById("app");
 
 const header = createHeader();

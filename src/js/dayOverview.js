@@ -5,25 +5,30 @@ import { isToday } from "./utils/date";
 
 function getTodayStats() {
   const todayTasks = taskList.filter((task) => isToday(task.createdAt));
-  
-  const all = todayTasks.length;
-  const done = todayTasks.filter((t) => t.status === "done").length;
-  const postponed = todayTasks.filter(
-    (t) => t.status === "progress" || t.status === "priority"
-  ).length;
 
-  const percentDone = all ? Math.round((done / all) * 100) : 0;
-  const percentPostponed = all ? Math.round((postponed / all) * 100) : 0;
+  const all = todayTasks.filter(t => t.status === "new").length;
+  const done = todayTasks.filter(t => t.status === "done").length;
+  const inProgress = todayTasks.filter(t => t.status === "progress").length;
+  const priority = todayTasks.filter(t => t.status === "priority").length;
+
+  const total = all + done + inProgress + priority;
+
+  const percentDone = total ? Math.round((done / total) * 100) : 0;
+  const percentPostponed = total ? Math.round((inProgress / total) * 100) : 0;
+  const percentPriority = total ? Math.round((priority / total) * 100) : 0;
 
   return {
-    all,
+    all, // только "new"
     done,
-    postponed,
+    inProgress,
+    priority,
     percentDone,
     percentPostponed,
-    tasks: todayTasks,
+    percentPriority,
+    tasks: todayTasks.filter(t => t.status === "new"), // только "new"
   };
 }
+
 
 function renderDayOverview() {
   const stats = getTodayStats();
@@ -33,6 +38,8 @@ function renderDayOverview() {
   const isNight = new Date().getHours() < 7 || new Date().getHours() > 20;
     // Добавляем тему в зависимости от времени суток
   container.classList.add(isNight ? "night-theme" : "day-theme");
+  console.log("Сегодняшние задачи:", stats.tasks);
+
   container.innerHTML = `
   <div class="day-overview-header">
 
@@ -69,38 +76,51 @@ function renderDayOverview() {
 </div>
 
 
-  <div class="day-overview-indicators">
-
-    <div class="indicator">
-      <div class="label">all deal</div>
-      <div class="value">${stats.all}</div>
+<div class="today-tasks">
+  ${stats.tasks.map((task, index) => `
+    <div class="task-row">
+      <div class="task-index">${index + 1}.</div>
+      <textarea class="day-task-input" readonly>${task.title}</textarea>
     </div>
+  `).join("")}
+</div>
 
-    <div class="indicator">
-      <div class="label">in progress</div>
-      <div class="progress-bar">
-        <div class="fill fill-inprogress" style="width: ${stats.percentPostponed}%"></div>
-      </div>
-      <div class="value">${stats.percentPostponed}%</div>
-    </div>
 
-    <div class="indicator">
-      <div class="label">priority</div>
-      <div class="progress-bar">
-        <div class="fill fill-priority" style="width: ${stats.percentPriority}%"></div>
-      </div>
-      <div class="value">${stats.percentPriority}%</div>
-    </div>
 
-    <div class="indicator">
-      <div class="label">done</div>
-      <div class="progress-bar">
-        <div class="fill fill-done" style="width: ${stats.percentDone}%"></div>
-      </div>
-      <div class="value">${stats.percentDone}%</div>
-    </div>
+<div class="day-overview-indicators">
 
-  </div>
+<div class="indicator">
+<div class="label">all deal</div>
+<div class="value">${stats.all}</div>
+</div>
+
+<div class="indicator">
+<div class="label">in progress</div>
+<div class="progress-bar">
+<div class="fill fill-inprogress" style="width: ${stats.percentPostponed}%"></div>
+</div>
+<div class="value">${stats.percentPostponed}%</div>
+</div>
+
+<div class="indicator">
+<div class="label">priority</div>
+<div class="progress-bar">
+<div class="fill fill-priority" style="width: ${stats.percentPriority}%"></div>
+</div>
+<div class="value">${stats.percentPriority}%</div>
+</div>
+
+<div class="indicator">
+<div class="label">done</div>
+<div class="progress-bar">
+<div class="fill fill-done" style="width: ${stats.percentDone}%"></div>
+</div>
+<div class="value">${stats.percentDone}%</div>
+</div>
+
+
+
+</div>
 `;
 
 if (isNight) {

@@ -3,6 +3,8 @@ import { setupColumnDropZones } from "./setupDnD";
 import { renderDayOverview } from "./dayOverview";
 import { initFlatpickr } from "./initFlatpickr";
 
+import { showSuccessModal } from "./successModal";
+
 // Загружаем список задач из localStorage или создаём пустой массив
 const taskList = JSON.parse(localStorage.getItem("tasks")) || [];
 // список задач taskList это то, что мы получаем из localStorage 
@@ -110,11 +112,11 @@ for (let cardsEl of allCards) {
       }
       // Добавляем задачу в массив
       taskList.push({
-        text: text,
-        id: Date.now(), // уникальный id
-        status: status,
-        createdAt: new Date(),
-      }); // createdAt отображаем дату для того, чтобы использовать ее для архива и календаря
+  id: Date.now(),                       // уникальный ID
+  title: text,                          // теперь используется title вместо text
+  status: status,                       // new / progress / priority / done
+  createdAt: new Date().toISOString(),  // для фильтра "сегодня"
+});
       console.log(new Date());
       // Обновляем хранилище и интерфейс
       localStorage.setItem("tasks", JSON.stringify(taskList));
@@ -123,6 +125,7 @@ for (let cardsEl of allCards) {
       if (form) form.remove();
       trigger.classList.remove("hidden");
       renderAllColumns();
+      renderDayOverview();
     });
   });
 }
@@ -132,6 +135,7 @@ for (let cardsEl of allCards) {
 setupColumnDropZones();
 renderAllColumns();
 renderDayOverview(); 
+showSuccessModal();
 
 // Запуск flatpickr (календаря) после полной загрузки DOM
 // На случай, если компонент TopInfoPanel ещё не создан
