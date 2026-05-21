@@ -4,6 +4,7 @@ import { renderDayOverview } from "./dayOverview";
 import { initFlatpickr } from "./initFlatpickr";
 
 import { showSuccessModal } from "./successModal";
+import { getTodayQuote } from './utils/getTodayQuote';
 
 // Загружаем список задач из localStorage или создаём пустой массив
 const taskList = JSON.parse(localStorage.getItem("tasks")) || [];
@@ -126,6 +127,7 @@ for (let cardsEl of allCards) {
       trigger.classList.remove("hidden");
       renderAllColumns();
       renderDayOverview();
+      
     });
   });
 }
@@ -135,12 +137,24 @@ for (let cardsEl of allCards) {
 setupColumnDropZones();
 renderAllColumns();
 renderDayOverview(); 
-showSuccessModal();
+
+
 
 // Запуск flatpickr (календаря) после полной загрузки DOM
 // На случай, если компонент TopInfoPanel ещё не создан
 document.addEventListener("DOMContentLoaded", () => {
   initFlatpickr();
 });
+
+function renderQuote() {
+  const container = document.getElementById('quote-of-the-day');
+  const { text, author } = getTodayQuote();
+
+  container.innerHTML = `
+    <p class="quote-text">"${text}"</p>
+    <p class="quote-author">— ${author}</p>
+  `;
+}
+
 
 export { taskList, placeholder };

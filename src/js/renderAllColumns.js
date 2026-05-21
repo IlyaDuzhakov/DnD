@@ -1,5 +1,5 @@
 import { randerTasks } from "./randerTasks";
-import { setupTasksDnD } from "./setupDnD";
+import { setupTasksDnD, setupBoardTrashDropZone, setupColumnDropZones } from "./setupDnD";
 
 //рендер всех колонок + после этого инициализация DnD
 function renderAllColumns() {
@@ -18,6 +18,8 @@ function renderAllColumns() {
 
   // после обновления DOM — навешиваем drag события на задачи
   setupTasksDnD();
+  setupColumnDropZones();
+  setupBoardTrashDropZone();
 }
 
 export { renderAllColumns };

@@ -1,53 +1,152 @@
-import { placeholder, taskList } from "./app"; // когда у нас несколько переменных импортируется из одного файла это можно делать через запятую
-import { countSize } from "./countSize"; // когда у нас несколько переменных импортируется из одного файла это можно делать через запятую
-import { renderAllColumns } from "./renderAllColumns"; // когда у нас несколько переменных импортируется из одного файла это можно делать через запятую
+import { placeholder, taskList } from "./app";
+import { countSize } from "./countSize";
+import { renderAllColumns } from "./renderAllColumns";
 import { renderDayOverview } from "./dayOverview";
 import { showSuccessModal } from "./successModal";
-
- // когда у нас несколько переменных импортируется из одного файла это можно делать через запятую
+import { addTaskToArchive } from "./archiveService";
 
 let indexDnD = null;
-const columns = document.querySelectorAll(".column");
+let draggedTaskId = null;
 
-//drag для самих задач (вызвать после рендера)
+function setupBoardTrashDropZone() {
+  const trashZone = document.querySelector("#trash");
+
+  console.log("1. setupBoardTrashDropZone вызвана");
+  console.log("2. trashZone:", trashZone);
+
+  if (!trashZone) {
+    console.log("3. Корзина НЕ найдена");
+    return;
+  }
+
+trashZone.addEventListener("dragover", (event) => {
+  event.preventDefault();
+
+  console.log("4. Карточка НАД корзиной");
+
+  trashZone.classList.add("trash-active");
+});
+
+trashZone.addEventListener("dragleave", () => {
+  trashZone.classList.remove("trash-active");
+});
+
+trashZone.addEventListener("drop", (event) => {
+  event.preventDefault();
+
+  console.log("5. DROP В КОРЗИНУ СРАБОТАЛ");
+
+  const taskId = event.dataTransfer.getData("text/plain");
+
+  console.log("6. taskId из dataTransfer:", taskId);
+
+  const taskIndex = taskList.findIndex(
+    (task) => String(task.id) === String(taskId),
+  );
+
+  console.log("8. taskIndex:", taskIndex);
+
+  if (taskIndex === -1) {
+    console.log("9. Задача НЕ найдена в taskList");
+    return;
+  }
+
+  taskList.splice(taskIndex, 1);
+
+  localStorage.setItem("tasks", JSON.stringify(taskList));
+
+  trashZone.classList.remove("trash-active");
+
+  if (placeholder.parentElement) {
+    placeholder.remove();
+  }
+
+  renderAllColumns();
+  renderDayOverview();
+});
+
+  trashZone.addEventListener("drop", (event) => {
+    event.preventDefault();
+
+    console.log("5. DROP В КОРЗИНУ СРАБОТАЛ");
+
+    const taskId = event.dataTransfer.getData("text/plain");
+    console.log("6. taskId из dataTransfer:", taskId);
+
+    console.log("7. taskList до удаления:", taskList);
+
+    const taskIndex = taskList.findIndex(
+      (task) => String(task.id) === String(taskId),
+    );
+
+    console.log("8. taskIndex:", taskIndex);
+
+    if (taskIndex === -1) {
+      console.log("9. Задача НЕ найдена в taskList");
+      return;
+    }
+
+    taskList.splice(taskIndex, 1);
+
+    console.log("10. taskList после удаления:", taskList);
+
+    localStorage.setItem("tasks", JSON.stringify(taskList));
+
+    renderAllColumns();
+    renderDayOverview();
+  });
+}
+// DnD для самих задач
 function setupTasksDnD() {
   const tasks = document.querySelectorAll(".task");
-  tasks.forEach((task) => {
-    task.draggable = true; // активируем способность к перетаскиванию
 
-    task.addEventListener("dragstart", () => {
+  tasks.forEach((task) => {
+    task.draggable = true;
+
+    task.addEventListener("dragstart", (event) => {
       const id = task.getAttribute("data-id");
-      indexDnD = taskList.findIndex((el) => el.id == id);
+
+      draggedTaskId = id;
+      indexDnD = taskList.findIndex((task) => String(task.id) === String(id));
+
+      event.dataTransfer.setData("text/plain", id);
+
       const rect = task.getBoundingClientRect();
 
-      //Задаем плейсхолдеру размеры
-      placeholder.style.height = rect.height + "px";
-      placeholder.style.width = rect.width + "px";
+      placeholder.style.height = `${rect.height}px`;
+      placeholder.style.width = `${rect.width}px`;
       placeholder.style.margin = getComputedStyle(task).margin;
-      setTimeout(() => (task.style.display = "none"), 0); // скрываем элемент, чтобы он не отображался в двух местах
-      // без setTimeout не будет работать логика с переносом, так как элемент будет исчезать
+
+      setTimeout(() => {
+        task.classList.add("dragging-task");
+      }, 0);
     });
 
-    // task.addEventListener('drag', (event) => {
-    //   console.log(event.target.closest('.task'))
-
-    // })
-
     task.addEventListener("dragend", () => {
-      placeholder.remove();
-      // закончили перенос для самой задачи
-      task.style.display = "block";
+      if (placeholder.parentElement) {
+        placeholder.remove();
+      }
+
+      task.classList.remove("dragging-task");
+
       indexDnD = null;
+      draggedTaskId = null;
     });
   });
 }
 
+// Drop-зоны для колонок и корзины
 function setupColumnDropZones() {
+  const columns = document.querySelectorAll(".column");
+
   columns.forEach((column) => {
     const taskListContainer = column.querySelector(".list__tasks");
 
+    if (!taskListContainer) return;
+
     column.addEventListener("dragover", (event) => {
       event.preventDefault();
+
       column.classList.add("dragover");
 
       const closestElement = countSize(taskListContainer, event.clientY);
@@ -65,116 +164,108 @@ function setupColumnDropZones() {
 
     column.addEventListener("drop", (event) => {
       event.preventDefault();
+
       column.classList.remove("dragover");
 
-      const id = taskListContainer.getAttribute("data-id");
-      let status;
-      if (id === "column-1") {
-        status = "new";
-      } else if (id === "column-2") {
-        status = "progress";
-      } else if (id === "column-3") {
-        status = "priority";
-      } else if (id === "column-4") {
-        status = "done";
-        // Показываем модальное окно, если задача попала в DONE
-        showSuccessModal();
-      }
+      const columnId = taskListContainer.getAttribute("data-id");
 
-      if (typeof indexDnD === "number" && indexDnD >= 0) {
-        const draggedTask = taskList[indexDnD];
-        draggedTask.status = status;
+      if (!draggedTaskId) return;
 
-        taskList.splice(indexDnD, 1);
-
-        const tasksInColumn = Array.from(
-          taskListContainer.querySelectorAll(".task"),
-        );
-        const placeholderIndex = Array.from(taskListContainer.children).indexOf(
-          placeholder,
+      // УДАЛЕНИЕ В КОРЗИНУ
+      if (columnId === "trash") {
+        const taskIndex = taskList.findIndex(
+          (task) => String(task.id) === String(draggedTaskId),
         );
 
-        let insertIndex = taskList.length;
-        if (placeholderIndex !== -1 && tasksInColumn.length > 0) {
-          const nextTaskEl = taskListContainer.children[placeholderIndex + 1];
-          if (nextTaskEl && nextTaskEl.classList.contains("task")) {
-            const nextTaskId = nextTaskEl.getAttribute("data-id");
-            const nextTaskIndex = taskList.findIndex((t) => t.id == nextTaskId);
-            if (nextTaskIndex !== -1) {
-              insertIndex = nextTaskIndex;
-            }
-          }
+        if (taskIndex !== -1) {
+          taskList.splice(taskIndex, 1);
+          localStorage.setItem("tasks", JSON.stringify(taskList));
         }
 
-        taskList.splice(insertIndex, 0, draggedTask);
+        column.classList.remove("dragover");
 
-        localStorage.setItem("tasks", JSON.stringify(taskList));
+        if (placeholder.parentElement) {
+          placeholder.remove();
+        }
+
         indexDnD = null;
+        draggedTaskId = null;
+
         renderAllColumns();
         renderDayOverview();
 
+        return;
       }
+      let status;
+
+      if (columnId === "column-1") {
+        status = "new";
+      } else if (columnId === "column-2") {
+        status = "progress";
+      } else if (columnId === "column-3") {
+        status = "priority";
+      } else if (columnId === "column-4") {
+        status = "done";
+      }
+
+      if (!status) return;
+
+      const draggedTaskIndex = taskList.findIndex(
+        (task) => String(task.id) === String(draggedTaskId),
+      );
+
+      if (draggedTaskIndex === -1) return;
+
+      const draggedTask = taskList[draggedTaskIndex];
+
+      draggedTask.status = status;
+
+      if (status === "done") {
+        addTaskToArchive(draggedTask);
+        showSuccessModal();
+      }
+
+      taskList.splice(draggedTaskIndex, 1);
+
+      const placeholderIndex = Array.from(taskListContainer.children).indexOf(
+        placeholder,
+      );
+
+      let insertIndex = taskList.length;
+
+      if (placeholderIndex !== -1) {
+        const nextTaskEl = taskListContainer.children[placeholderIndex + 1];
+
+        if (nextTaskEl && nextTaskEl.classList.contains("task")) {
+          const nextTaskId = nextTaskEl.getAttribute("data-id");
+
+          const nextTaskIndex = taskList.findIndex(
+            (task) => String(task.id) === String(nextTaskId),
+          );
+
+          if (nextTaskIndex !== -1) {
+            insertIndex = nextTaskIndex;
+          }
+        }
+      }
+
+      if (status !== "done") {
+        taskList.splice(insertIndex, 0, draggedTask);
+      }
+
+      localStorage.setItem("tasks", JSON.stringify(taskList));
 
       if (placeholder.parentElement) {
         placeholder.remove();
       }
+
+      indexDnD = null;
+      draggedTaskId = null;
+
+      renderAllColumns();
+      renderDayOverview();
     });
   });
 }
 
-export { setupTasksDnD, setupColumnDropZones };
-
-// column.addEventListener("drop", (event) => {
-//   event.preventDefault();
-//   column.classList.remove("dragover");
-
-//   const id = column.getAttribute("data-id");
-//   let status;
-//   if (id === "column-1") {
-//     status = "new";
-//   } else if (id === "column-2") {
-//     status = "progress";
-//   } else {
-//     status = "done";
-//   }
-
-//   if (typeof indexDnD === "number" && indexDnD >= 0) {
-//     const draggedTask = taskList[indexDnD];
-//     draggedTask.status = status;
-
-//     // найдём куда вставить
-//     const tasksInColumn = [...column.querySelectorAll(".task")]; // спред оператор распаковывает элементы какой-то последовательности
-//     const placeholderIndex = tasksInColumn.findIndex(
-//       // ищем индекс элемента в массиве по условию
-//       (t) => t === placeholder,
-//     );
-
-//     // удаляем из старого места
-//     taskList.splice(indexDnD, 1);
-
-//     // вставляем в нужное место
-//     if (placeholderIndex === -1) {
-//       taskList.push(draggedTask); // метод push всегда добавляет элемент в конец массива
-//     } else {
-//       const newIndex = taskList.findIndex(
-//         (t) =>
-//           t.status === status &&
-//           tasksInColumn.indexOf(
-//             document.querySelector(`[data-id="${t.id}"]`),
-//           ) >= placeholderIndex,
-//       );
-//       if (newIndex === -1) {
-//         taskList.push(draggedTask);
-//       } else {
-//         taskList.splice(newIndex, 0, draggedTask);
-//       }
-//     }
-
-//     localStorage.setItem("tasks", JSON.stringify(taskList));
-//     indexDnD = null;
-//     renderAllColumns();
-//   }
-//   if (placeholder.parentElement) {
-//     placeholder.parentElement.remove(placeholder); // removeChild заменяем на remove так как removeChild устарел
-//   }
-// });
+export { setupTasksDnD, setupColumnDropZones, setupBoardTrashDropZone };

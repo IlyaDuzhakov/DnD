@@ -1,22 +1,54 @@
-// src/components/Footer.js
+import { showArchiveModal } from "../js/archiveModal.js";
+import {showHistoryModal} from "../js/historyModal.js";
+
+import archiveIcon from '../img/archive.svg';
+import historyIcon from '../img/history.svg';
 
 export default function createFooter() {
   const footer = document.createElement("footer");
   footer.classList.add("footer");
 
   footer.innerHTML = `
-    <div class="footer-left">
-      <div class="trash-wrapper" id="trash">
-        <svg class="trash-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M9 3V4H4V6H5V20C5 21.1 5.9 22 7 22H17C18.1 22 19 21.1 19 20V6H20V4H15V3H9ZM7 6H17V20H7V6ZM9 8V18H11V8H9ZM13 8V18H15V8H13Z"/>
-        </svg>
-        <span class="trash-label">Корзина</span>
-      </div>
-    </div>
-    
-    <div class="footer-center made">Made by Ilya Duzhakov</div>
-    <div class="footer-right time">© 2025 SwiftBoard</div>
-  `;
+  <div class="footer-left">
+
+   
+
+    <button class="footer-action archive-wrapper">
+      <span class="footer-icon">
+        <img class="footer-svg" src="${archiveIcon}" alt="Архив">
+      </span>
+      <span>Архив</span>
+    </button>
+
+    <button class="footer-action history-wrapper">
+      <span class="footer-icon">
+        <img class="footer-svg" src="${historyIcon}" alt="История">
+      </span>
+      <span>История</span>
+    </button>
+
+  </div>
+
+  <div class="footer-center made">
+    Made by Ilya Duzhakov
+  </div>
+
+  <div class="footer-right time">
+    © 2025 SwiftBoard
+  </div>
+`;
+
+  const archiveBtn = footer.querySelector(".archive-wrapper");
+
+  archiveBtn.addEventListener("click", () => {
+    showArchiveModal();
+  });
+
+  const historyBtn = footer.querySelector(".history-wrapper");
+
+  historyBtn.addEventListener("click", () => {
+    showHistoryModal();
+  });
 
   return footer;
 }
