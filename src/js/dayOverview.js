@@ -4,7 +4,7 @@ import { getTodayQuote } from "./utils/getTodayQuote";
 import { loadArchive } from "./archiveService";
 import { moveTodayCompletedToHistory } from "./historyService";
 
-// === Подсчёт статистики за сегодня ===
+// Подсчёт статистики за сегодня
 function getTodayStats() {
   const archiveList = loadArchive();
 
@@ -51,7 +51,7 @@ function getTodayStats() {
     tasks: activeTodayTasks.filter((t) => t.status === "new"),
   };
 }
-// === Обеспечиваем наличие блока для цитаты ===
+// Обеспечиваем наличие блока для цитаты
 function ensureContainersExist() {
   const app = document.querySelector("#app");
   if (!app) return;
@@ -107,7 +107,7 @@ function ensureContainersExist() {
   app.appendChild(quoteDiv);
 }
 
-// === Рендер цитаты (поддерживаем {quote} и {text}) ===
+//  Рендер цитаты (поддерживаем {quote} и {text})
 function renderQuote() {
   const node = document.getElementById("quote-of-the-day");
   if (!node) return;
@@ -122,7 +122,7 @@ function renderQuote() {
   `;
 }
 
-// === Основной рендер блока статистики ===
+// Основной рендер блока статистики
 function renderDayOverview() {
   ensureContainersExist();
 
@@ -157,42 +157,9 @@ function renderDayOverview() {
 
   statsBlock.innerHTML = `
     <div class="day-overview-header">
-      <div class="sky-icons">
-        ${
-          isNight
-            ? `
-          <svg class="moon-icon" viewBox="0 0 24 24" width="32" height="32" fill="#f0f0f0">
-            <path d="M21 12.79A9 9 0 0111.21 3 7 7 0 1012 21a9 9 0 009-8.21z"/>
-          </svg>
-          <div class="stars-row">
-            ${Array.from({ length: 15 })
-              .map(
-                () => `
-              <svg class="star-icon" viewBox="0 0 24 24" width="12" height="12" fill="#fffacd">
-                <polygon points="12,2 15,9 22,9 17,14 19,21 12,17 5,21 7,14 2,9 9,9"/>
-              </svg>
-            `,
-              )
-              .join("")}
-          </div>
-        `
-            : `
-          <svg class="sun-icon" viewBox="0 0 24 24" width="32" height="32" fill="#FFD700">
-            <circle cx="12" cy="12" r="5"></circle>
-            <g stroke="#FFD700" stroke-width="2">
-              <line x1="12" y1="1" x2="12" y2="4"></line>
-              <line x1="12" y1="20" x2="12" y2="23"></line>
-              <line x1="1" y1="12" x2="4" y2="12"></line>
-              <line x1="20" y1="12" x2="23" y2="12"></line>
-              <line x1="4.2" y1="4.2" x2="6.3" y2="6.3"></line>
-              <line x1="17.7" y1="17.7" x2="19.8" y2="19.8"></line>
-              <line x1="4.2" y1="19.8" x2="6.3" y2="17.7"></line>
-              <line x1="17.7" y1="6.3" x2="19.8" y2="4.2"></line>
-            </g>
-          </svg>
-        `
-        }
-      </div>
+      <div class="theme-badge ${isNight ? "theme-badge-night" : "theme-badge-day"}">
+  ${isNight ? "Night mode" : "Day mode"}
+</div>
       <h2 class="title_text">DAY OVERVIEW</h2>
     </div>
     <div class="today-tasks">
@@ -239,20 +206,6 @@ function renderDayOverview() {
     moveTodayCompletedToHistory();
     renderDayOverview();
   });
-  // расставляем звёзды случайно при ночной теме
-  if (isNight) {
-    const stars = statsBlock.querySelectorAll(".star-icon");
-    stars.forEach((star) => {
-      const x = Math.random() * 90;
-      const y = Math.random() * 60;
-      const scale = 0.7 + Math.random() * 0.6;
-      star.style.position = "relative";
-      star.style.left = `${x}%`;
-      star.style.top = `${y}px`;
-      star.style.transform = `scale(${scale})`;
-      star.style.animationDuration = `${2 + Math.random() * 3}s`;
-    });
-  }
 
   renderQuote();
 }

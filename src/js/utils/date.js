@@ -7,7 +7,7 @@ export function isToday(dateString) {
   const today = new Date();
   const date = new Date(dateString);
   return (
-    today.getFullYear() === date.getFullYear() &&
+    // today.getFullYear() === date.getFullYear() &&
     today.getMonth() === date.getMonth() &&
     today.getDate() === date.getDate()
   );

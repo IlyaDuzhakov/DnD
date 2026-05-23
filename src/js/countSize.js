@@ -6,7 +6,7 @@ const countSize = (container, y) => {
 
   for (let task of allTasks) {
     let coords = task.getBoundingClientRect(); // получаем координаты нашего элемента
-    // console.log(coords)
+    
     const centralCoords = coords.top + coords.height / 2;
     const differenceBetweenCoordidinates = y - centralCoords;
     if (

@@ -28,13 +28,14 @@ export default function createFooter() {
     </button>
 
   </div>
-
+  <div class="footer-wrapper">
   <div class="footer-center made">
     Made by Ilya Duzhakov
   </div>
 
   <div class="footer-right time">
     © 2025 SwiftBoard
+  </div>
   </div>
 `;
 

@@ -20,17 +20,25 @@ export function createTopInfoPanel() {
   panel.innerHTML = `
   <div class="top-dashboard-row">
 
-    <div class="time-block">
-      <div>Москва: <span class="tz" data-tz="Europe/Moscow">--:--:--</span></div>
-      <div>Центр. Европа: <span class="tz" data-tz="Europe/Berlin">--:--:--</span></div>
-      <div>Лондон: <span class="tz" data-tz="Europe/London">--:--:--</span></div>
-      <div>Нью-Йорк: <span class="tz" data-tz="America/New_York">--:--:--</span></div>
-      <div>Казахстан: <span class="tz" data-tz="Asia/Almaty">--:--:--</span></div>
-      <div>Аргентина: <span class="tz" data-tz="America/Argentina/Buenos_Aires">--:--:--</span></div>
-      <div>Австралия (Сидней): <span class="tz" data-tz="Australia/Sydney">--:--:--</span></div>
-      <div>Токио: <span class="tz" data-tz="Asia/Tokyo">--:--:--</span></div>
-      <div>UTC: <span class="tz" data-tz="UTC">--:--:--</span></div>
-    </div>
+ <div class="time-block">
+  <div>Москва: <span class="tz" data-tz="Europe/Moscow">--:--:--</span></div>
+
+  <div>Армения: <span class="tz" data-tz="Asia/Yerevan">--:--:--</span></div>
+
+  <div>Казахстан: <span class="tz" data-tz="Asia/Almaty">--:--:--</span></div>
+
+  <div>Швейцария: <span class="tz" data-tz="Europe/Zurich">--:--:--</span></div>
+
+  <div>Нью-Йорк: <span class="tz" data-tz="America/New_York">--:--:--</span></div>
+
+  <div>Аргентина: <span class="tz" data-tz="America/Argentina/Buenos_Aires">--:--:--</span></div>
+
+  <div>Австралия: <span class="tz" data-tz="Australia/Sydney">--:--:--</span></div>
+
+  <div>Токио: <span class="tz" data-tz="Asia/Tokyo">--:--:--</span></div>
+
+  <div>Китай: <span class="tz" data-tz="Asia/Shanghai">--:--:--</span></div>
+</div>
 
    <div class="calendar-block">
   <input id="calendar" type="text" />

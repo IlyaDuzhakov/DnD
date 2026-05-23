@@ -11,84 +11,61 @@ let draggedTaskId = null;
 function setupBoardTrashDropZone() {
   const trashZone = document.querySelector("#trash");
 
-  console.log("1. setupBoardTrashDropZone вызвана");
-  console.log("2. trashZone:", trashZone);
-
   if (!trashZone) {
-    console.log("3. Корзина НЕ найдена");
     return;
   }
 
-trashZone.addEventListener("dragover", (event) => {
-  event.preventDefault();
+  trashZone.addEventListener("dragover", (event) => {
+    event.preventDefault();
 
-  console.log("4. Карточка НАД корзиной");
+    trashZone.classList.add("trash-active");
+  });
 
-  trashZone.classList.add("trash-active");
-});
-
-trashZone.addEventListener("dragleave", () => {
-  trashZone.classList.remove("trash-active");
-});
-
-trashZone.addEventListener("drop", (event) => {
-  event.preventDefault();
-
-  console.log("5. DROP В КОРЗИНУ СРАБОТАЛ");
-
-  const taskId = event.dataTransfer.getData("text/plain");
-
-  console.log("6. taskId из dataTransfer:", taskId);
-
-  const taskIndex = taskList.findIndex(
-    (task) => String(task.id) === String(taskId),
-  );
-
-  console.log("8. taskIndex:", taskIndex);
-
-  if (taskIndex === -1) {
-    console.log("9. Задача НЕ найдена в taskList");
-    return;
-  }
-
-  taskList.splice(taskIndex, 1);
-
-  localStorage.setItem("tasks", JSON.stringify(taskList));
-
-  trashZone.classList.remove("trash-active");
-
-  if (placeholder.parentElement) {
-    placeholder.remove();
-  }
-
-  renderAllColumns();
-  renderDayOverview();
-});
+  trashZone.addEventListener("dragleave", () => {
+    trashZone.classList.remove("trash-active");
+  });
 
   trashZone.addEventListener("drop", (event) => {
     event.preventDefault();
 
-    console.log("5. DROP В КОРЗИНУ СРАБОТАЛ");
-
     const taskId = event.dataTransfer.getData("text/plain");
-    console.log("6. taskId из dataTransfer:", taskId);
-
-    console.log("7. taskList до удаления:", taskList);
 
     const taskIndex = taskList.findIndex(
       (task) => String(task.id) === String(taskId),
     );
 
-    console.log("8. taskIndex:", taskIndex);
-
     if (taskIndex === -1) {
-      console.log("9. Задача НЕ найдена в taskList");
       return;
     }
 
     taskList.splice(taskIndex, 1);
 
-    console.log("10. taskList после удаления:", taskList);
+    localStorage.setItem("tasks", JSON.stringify(taskList));
+
+    trashZone.classList.remove("trash-active");
+
+    if (placeholder.parentElement) {
+      placeholder.remove();
+    }
+
+    renderAllColumns();
+    renderDayOverview();
+  });
+
+  trashZone.addEventListener("drop", (event) => {
+    event.preventDefault();
+
+    const taskId = event.dataTransfer.getData("text/plain");
+
+    const taskIndex = taskList.findIndex(
+      (task) => String(task.id) === String(taskId),
+    );
+
+    if (taskIndex === -1) {
+      return;
+    }
+
+    taskList.splice(taskIndex, 1);
 
     localStorage.setItem("tasks", JSON.stringify(taskList));
 
@@ -96,7 +73,7 @@ trashZone.addEventListener("drop", (event) => {
     renderDayOverview();
   });
 }
-// DnD для самих задач
+
 function setupTasksDnD() {
   const tasks = document.querySelectorAll(".task");
 
@@ -171,7 +148,7 @@ function setupColumnDropZones() {
 
       if (!draggedTaskId) return;
 
-      // УДАЛЕНИЕ В КОРЗИНУ
+      // удаление в корзину
       if (columnId === "trash") {
         const taskIndex = taskList.findIndex(
           (task) => String(task.id) === String(draggedTaskId),

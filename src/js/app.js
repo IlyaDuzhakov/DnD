@@ -4,16 +4,15 @@ import { renderDayOverview } from "./dayOverview";
 import { initFlatpickr } from "./initFlatpickr";
 
 import { showSuccessModal } from "./successModal";
-import { getTodayQuote } from './utils/getTodayQuote';
+import { getTodayQuote } from "./utils/getTodayQuote";
 
 // Загружаем список задач из localStorage или создаём пустой массив
 const taskList = JSON.parse(localStorage.getItem("tasks")) || [];
-// список задач taskList это то, что мы получаем из localStorage 
+// список задач taskList это то, что мы получаем из localStorage
 // по ключу tasks или если в localStorage еще ничего нет, это будет []
 // localStorage хранит данные только в формате строки
 // JSON.parse строки преобразует обратно в объекты, массивы
 // JSON.stringify объекты и массивы преобразует в строки
-// console.log(taskList);
 
 // return task Today
 
@@ -28,6 +27,24 @@ function isToday(dateString) {
   );
 }
 
+function showValidationModal(message) {
+  const modal = document.createElement("div");
+  modal.className = "validation-modal";
+
+  modal.innerHTML = `
+    <div class="validation-content">
+      <h3>Нужно заполнить задачу</h3>
+      <p>${message}</p>
+      <button class="validation-close">Понятно</button>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  modal.querySelector(".validation-close").addEventListener("click", () => {
+    modal.remove();
+  });
+}
 
 // делегирование удаления (навесили один раз)
 document.addEventListener("click", (e) => {
@@ -67,7 +84,7 @@ const html = `
     </div>
   </div>`;
 
-  // Находим все блоки ".cards" (они содержат кнопку "+ Add another card")
+// Находим все блоки ".cards" (они содержат кнопку "+ Add another card")
 const allCards = document.querySelectorAll(".cards");
 for (let cardsEl of allCards) {
   cardsEl.addEventListener("click", (e) => {
@@ -104,21 +121,27 @@ for (let cardsEl of allCards) {
     } else {
       status = "done";
     }
+
     // Обработка добавления задачи
     btnAdd.addEventListener("click", () => {
       const text = textarea.value.trim();
       if (!text) {
-        alert("Заполни текст");
+        showValidationModal("Поле не может быть пустым");
+        return;
+      }
+
+      if (text.length < 2) {
+        showValidationModal("Минимум 2 символа");
         return;
       }
       // Добавляем задачу в массив
       taskList.push({
-  id: Date.now(),                       // уникальный ID
-  title: text,                          // теперь используется title вместо text
-  status: status,                       // new / progress / priority / done
-  createdAt: new Date().toISOString(),  // для фильтра "сегодня"
-});
-      console.log(new Date());
+        id: Date.now(), // уникальный ID
+        title: text, // теперь используется title вместо text
+        status: status, // new / progress / priority / done
+        createdAt: new Date().toISOString(), // для фильтра "сегодня"
+      });
+
       // Обновляем хранилище и интерфейс
       localStorage.setItem("tasks", JSON.stringify(taskList));
       // убираем форму и показываем триггер снова
@@ -127,18 +150,14 @@ for (let cardsEl of allCards) {
       trigger.classList.remove("hidden");
       renderAllColumns();
       renderDayOverview();
-      
     });
   });
 }
 
-
 // Инициализация: навешиваем зону для drag'n'drop, рендерим колонки и блок дня
 setupColumnDropZones();
 renderAllColumns();
-renderDayOverview(); 
-
-
+renderDayOverview();
 
 // Запуск flatpickr (календаря) после полной загрузки DOM
 // На случай, если компонент TopInfoPanel ещё не создан
@@ -147,7 +166,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function renderQuote() {
-  const container = document.getElementById('quote-of-the-day');
+  const container = document.getElementById("quote-of-the-day");
   const { text, author } = getTodayQuote();
 
   container.innerHTML = `
@@ -155,6 +174,5 @@ function renderQuote() {
     <p class="quote-author">— ${author}</p>
   `;
 }
-
 
 export { taskList, placeholder };

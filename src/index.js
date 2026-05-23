@@ -1,4 +1,5 @@
 import "./css/style.css";
+import "./css/media.css";
 import "./js/app.js";
 
 import createHeader from "./components/Header.js";
@@ -10,18 +11,18 @@ import { ensureContainersExist, renderDayOverview } from "./js/dayOverview";
 
 const root = document.getElementById("app");
 
-// === создаём элементы ===
+// создаём элементы 
 const header = createHeader();
 const topInfoPanel = createTopInfoPanel();
 topInfoPanel.id = "day-overview"; // здесь и будут часы + календарь + статистика
 const footer = createFooter();
 
-// === вставляем в нужном порядке ===
+// вставляем в нужном порядке 
 root.prepend(header);
 root.insertBefore(topInfoPanel, root.children[1]);
 root.append(footer);
 
-// === инициализация ===
+// инициализация
 document.addEventListener("DOMContentLoaded", () => {
   initFlatpickr();
   ensureContainersExist(); 

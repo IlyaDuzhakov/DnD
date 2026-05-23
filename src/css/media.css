@@ -1,0 +1,298 @@
+@media (max-width: 1550px) {
+  .board-columns {
+    grid-template-columns: repeat(2, minmax(260px, 1fr));
+  }
+}
+
+@media (max-width: 950px) {
+  .board-columns {
+    grid-template-columns: 1fr;
+  }
+  .top-dashboard-row {
+    grid-template-columns: 1fr;
+
+    gap: 32px;
+  }
+  .top-dashboard-row {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+  }
+
+  .time-block,
+  .calendar-wrapper,
+  .top-info-panel {
+    width: 100%;
+  }
+}
+
+@media (max-width: 700px) {
+  .theme-badge {
+    position: static;
+    width: max-content;
+    margin: 0 auto 16px;
+  }
+
+  .today-tasks {
+    padding-right: 0;
+    min-height: 120px;
+  }
+  .day-overview-indicators {
+    width: 85%;
+  }
+  .overview-stats {
+    max-width: 700px;
+    width: 100%;
+    margin: 0 auto;
+    min-height: 430px;
+    margin-bottom: 30px;
+    min-height: 430px;
+    padding: 50px 40px 55px;
+  }
+
+  .end-day-btn {
+    display: block;
+    margin: 20px auto 0;
+  }
+}
+
+@media (max-width: 650px) {
+  .header-title {
+    font-size: 36px;
+  }
+  .header-subtitle {
+    font-size: 14px;
+  }
+  .end-day-btn {
+    margin: 10px auto 0;
+  }
+}
+
+@media (max-width: 550px) {
+  .logo-container {
+    flex-direction: column;
+  }
+  .footer {
+    flex-direction: column;
+    height: 130px;
+  }
+  .footer-left {
+    margin-bottom: 10px;
+  }
+  .add-card {
+    font-size: 0;
+  }
+
+  .add-card::before {
+    content: "+ Add card";
+    font-size: 24px;
+  }
+  .flatpickr-calendar {
+    transform: scale(0.82);
+    transform-origin: top center;
+  }
+
+  .flatpickr-day {
+    max-width: 34px;
+    height: 34px;
+    line-height: 34px;
+    font-size: 13px;
+  }
+
+  .flatpickr-weekday {
+    font-size: 12px;
+  }
+
+  .flatpickr-current-month {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 430px) {
+  .overview-stats {
+    width: 100%;
+    padding: 25px 18px 35px;
+    border-radius: 24px;
+  }
+
+  .indicator .label {
+    font-size: 11px;
+    line-height: 1;
+  }
+
+  .indicator .value {
+    font-size: 11px;
+  }
+  .title_text {
+    font-size: 24px;
+    line-height: 1.1;
+  }
+
+  .day-task-input {
+    min-height: 52px;
+    font-size: 16px;
+  }
+
+  .today-tasks {
+    gap: 12px;
+  }
+
+  .day-overview-indicators {
+    margin-top: 30px;
+    gap: 14px;
+  }
+
+  .progress-bar {
+    width: 42px;
+    height: 8px;
+  }
+
+  .end-day-btn {
+    margin-top: 30px;
+    font-size: 15px;
+    padding: 12px 18px;
+  }
+  .column {
+    width: 92%;
+    min-height: auto;
+    padding: 18px 14px 25px;
+  }
+  .task-card {
+    width: 100%;
+    min-height: 48px;
+    font-size: 15px;
+  }
+  .cards {
+    margin-bottom: 20px;
+  }
+  .add-card-btn {
+    width: 100%;
+    min-height: 54px;
+    font-size: 18px;
+  }
+  .history-content {
+    width: 92%;
+    padding: 22px 16px;
+  }
+
+  .history-content h2 {
+    font-size: 28px;
+  }
+
+  .history-day h3 {
+    font-size: 20px;
+  }
+
+  .history-task {
+    font-size: 15px;
+  }
+
+  .history-close {
+    padding: 10px 24px;
+    font-size: 16px;
+  }
+  .archive-content {
+    width: 88%;
+    max-width: 360px;
+
+    padding: 34px 18px 28px;
+
+    border-radius: 24px;
+  }
+
+  .archive-content h2 {
+    font-size: 42px;
+    line-height: 1.15;
+
+    margin-bottom: 30px;
+  }
+
+  .archive-list {
+    padding: 0;
+    margin: 0 0 24px;
+
+    list-style: none;
+  }
+
+  .archive-list li {
+    font-size: 16px;
+
+    padding: 10px 12px;
+    margin-bottom: 10px;
+
+    border-radius: 10px;
+
+    text-align: left;
+
+    word-break: break-word;
+  }
+
+  .archive-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .archive-clear,
+  .archive-close {
+    font-size: 15px;
+
+    padding: 12px 14px;
+
+    border-radius: 10px;
+  }
+}
+
+@media (max-width: 350px) {
+  .time-block {
+    font-size: 12px;
+    gap: 4px;
+  }
+
+  .time-block div {
+    padding: 2px 0;
+  }
+  .add-card::before {
+    content: "+ Сard";
+    font-size: 24px;
+  }
+  .in__progress .title {
+    font-size: 0;
+  }
+
+  .in__progress .title::before {
+    content: "PROGRESS";
+    font-size: 24px;
+  }
+
+  .progress-bar {
+    width: 26px;
+    height: 6px;
+  }
+
+  .indicator .label,
+  .indicator .value {
+    font-size: 10px;
+  }
+
+  .day-overview-indicators {
+    gap: 5px;
+  }
+  .end-day-btn {
+    font-size: 8px;
+  }
+  .archive-content h2 {
+    font-size: 34px;
+  }
+
+  .archive-buttons {
+    flex-direction: column;
+  }
+
+  .archive-clear,
+  .archive-close {
+    width: 100%;
+  }
+}
