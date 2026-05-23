@@ -47,25 +47,25 @@ The project was created as a full drag-and-drop task board with a responsive int
 
 # Desktop Version
 
-<img width="1400" alt="desktop" src="./screenshots/desktop-board.png">
+<img width="1400" alt="desktop" src="./src/screenshots/desktop-board.png">
 
-<img width="1400" alt="desktop-dashboard" src="./screenshots/desktop-dashboard.png">
+<img width="1400" alt="desktop-dashboard" src="./src/screenshots/desktop-dashboard.png">
 
 ---
 
 # Tablet Version
 
-<img width="900" alt="tablet" src="./screenshots/tablet.png">
+<img width="900" alt="tablet" src="./src/screenshots/tablet.png">
 
-<img width="900" alt="tablet-board" src="./screenshots/tablet-board.png">
+<img width="900" alt="tablet-board" src="./src/screenshots/tablet-board.png">
 
 ---
 
 # Mobile Version
 
-<img width="400" alt="mobile-dashboard" src="./screenshots/mobile-dashboard.png">
+<img width="400" alt="mobile-dashboard" src="./src/screenshots/mobile-dashboard.png">
 
-<img width="400" alt="mobile-board" src="./screenshots/mobile-board.png">
+<img width="400" alt="mobile-board" src="./src/screenshots/mobile-board.png">
 
 ---
 
